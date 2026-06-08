@@ -35,12 +35,36 @@ async function run() {
     const jobCollections = hireloopUsersDB.collection('jobs')
 
 
-    app.post('/jobspost', async(req, res)=>{
-        const job = req.body;
-        const result = await jobCollections.insertOne(job)
-        console.log(result)
-        res.send(result)
+    app.post('/jobspost', async (req, res) => {
+      const job = req.body;
+      const result = await jobCollections.insertOne(job)
+      console.log(result)
+      res.send(result)
     })
+
+
+    app.get('/jobs', async (req, res) => {
+      try {
+        const query = {};
+
+        // যদি companyId আসে
+        if (req.query.companyId) {
+          query.companyId = req.query.companyId;
+        }
+
+        // যদি status আসে
+        if (req.query.status) {
+          query.status = req.query.status;
+        }
+
+        const jobs = await jobCollections.find(query).toArray();
+
+        res.send(jobs);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Server Error" });
+      }
+    });
 
 
 
