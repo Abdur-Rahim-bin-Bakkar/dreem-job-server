@@ -11,7 +11,7 @@ const port = 5000
 app.use(cors())
 app.use(express.json())
 
-
+// this is home page for check server
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
@@ -33,8 +33,11 @@ async function run() {
     await client.connect();
     const hireloopUsersDB = client.db("hireloopUsers")
     const jobCollections = hireloopUsersDB.collection('jobs')
+    const companyCollection = hireloopUsersDB.collection('company')
 
 
+
+    // post job
     app.post('/jobspost', async (req, res) => {
       const job = req.body;
       const result = await jobCollections.insertOne(job)
@@ -43,6 +46,7 @@ async function run() {
     })
 
 
+    // get all jobs
     app.get('/jobs', async (req, res) => {
       try {
         const query = {};
@@ -66,6 +70,14 @@ async function run() {
       }
     });
 
+
+    // post company
+    app.post('/companypost', async (req, res) => {
+      const company = req.body;
+      const result = await companyCollection.insertOne(company)
+      console.log(result)
+      res.send(result)
+    })
 
 
 
