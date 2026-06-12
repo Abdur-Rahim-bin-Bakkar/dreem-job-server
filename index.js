@@ -79,6 +79,16 @@ async function run() {
       res.send(result)
     })
 
+    app.get('/my/company', async (req, res) => {
+      const query = {}
+      if (req.query.recruiterId) {
+        query.recruiterId = req.query.recruiterId
+      }
+      const result = await companyCollection.findOne(query)
+      res.send(result)
+      console.log(result, 'this is company resule')
+    })
+
 
 
 
