@@ -50,10 +50,43 @@ async function run() {
     })
 
     //get all jos
+    // app.get('/all/jobs', async (req, res) => {
+    //   const jobs = await jobCollections.find().toArray();
+    //   res.send(jobs)
+    // })
     app.get('/all/jobs', async (req, res) => {
-      const jobs = await jobCollections.find().toArray();
-      res.send(jobs)
-    })
+      const {
+        search,
+        category,
+        type,
+        remote
+      } = req.query;
+
+      const query = {};
+
+      if (search) {
+        query.jobTitle = {
+          $regex: search,
+          $options: "i"
+        };
+      }
+
+      if (category) {
+        query.jobCategory = category;
+      }
+
+      if (type) {
+        query.jobType = type;
+      }
+
+      if (remote) {
+        query.isRemote = remote === "true";
+      }
+
+      const jobs = await jobCollections.find(query).toArray();
+
+      res.send(jobs);
+    });
 
 
     // get recruiter jobs
