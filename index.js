@@ -40,13 +40,23 @@ async function run() {
     // post job
     app.post('/jobspost', async (req, res) => {
       const job = req.body;
-      const result = await jobCollections.insertOne(job)
+      const newJob = {
+        ...job,
+        createAt: new Date()
+      }
+      const result = await jobCollections.insertOne(newJob)
       console.log(result)
       res.send(result)
     })
 
+    //get all jos
+    app.get('/all/jobs', async (req, res) => {
+      const jobs = await jobCollections.find().toArray();
+      res.send(jobs)
+    })
 
-    // get all jobs
+
+    // get recruiter jobs
     app.get('/jobs', async (req, res) => {
       try {
         const query = {};
@@ -74,18 +84,24 @@ async function run() {
     // post company
     app.post('/companypost', async (req, res) => {
       const company = req.body;
-      const result = await companyCollection.insertOne(company)
+      const newCompany = {
+        ...company,
+        createAt: new Date()
+      }
+      const result = await companyCollection.insertOne(newCompany)
       console.log(result)
       res.send(result)
     })
 
+
+    //get my company
     app.get('/my/company', async (req, res) => {
       const query = {}
       if (req.query.recruiterId) {
         query.recruiterId = req.query.recruiterId
       }
       const result = await companyCollection.findOne(query)
-      res.send(result)
+      res.send(result || {})
       console.log(result, 'this is company resule')
     })
 
