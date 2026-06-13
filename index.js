@@ -34,6 +34,7 @@ async function run() {
     const hireloopUsersDB = client.db("hireloopUsers")
     const jobCollections = hireloopUsersDB.collection('jobs')
     const companyCollection = hireloopUsersDB.collection('company')
+    const applicationCollection = hireloopUsersDB.collection('applications')
 
 
 
@@ -154,6 +155,19 @@ async function run() {
       const result = await companyCollection.findOne(query)
       res.send(result || {})
       console.log(result, 'this is company resule')
+    })
+
+    
+    //post applications:
+    app.post('/application', async(req, res)=>{
+      const application = req.body;
+      const newApplication = {
+        ...application, 
+        createAt: new Date()
+      }
+      const result = await applicationCollection.insertOne(newApplication);
+      res.send(result)
+      console.log(result,'application post console')
     })
 
 
