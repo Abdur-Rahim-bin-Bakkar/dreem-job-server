@@ -1,5 +1,5 @@
 const express = require('express')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const dotenv = require('dotenv')
 const cors = require('cors')
 const dns = require("node:dns").promises;
@@ -88,6 +88,24 @@ async function run() {
       res.send(jobs);
     });
 
+    //get single job
+    app.get('/job/:id', async (req, res) => {
+      const id = req.params.id;
+      const job = await jobCollections.findOne({_id: new ObjectId(id )})
+      res.send(job)
+      
+    })
+
+
+
+
+
+
+
+
+
+
+    
 
     // get recruiter jobs
     app.get('/jobs', async (req, res) => {
