@@ -34,7 +34,10 @@ async function run() {
     const hireloopUsersDB = client.db("hireloopUsers")
     const jobCollections = hireloopUsersDB.collection('jobs')
     const companyCollection = hireloopUsersDB.collection('company')
-    const applicationCollection = hireloopUsersDB.collection('applications')
+    const applicationCollection = hireloopUsersDB.collection('applications');
+    const plans = hireloopUsersDB.collection('plans')
+    const subscriptions = hireloopUsersDB.collection('subscriptions')
+    const userCollection = hireloopUsersDB.collection('user')
 
 
 
@@ -92,21 +95,13 @@ async function run() {
     //get single job
     app.get('/job/:id', async (req, res) => {
       const id = req.params.id;
-      const job = await jobCollections.findOne({_id: new ObjectId(id )})
+      const job = await jobCollections.findOne({ _id: new ObjectId(id) })
       res.send(job)
-      
+
     })
 
 
 
-
-
-
-
-
-
-
-    
 
     // get recruiter jobs
     app.get('/jobs', async (req, res) => {
@@ -157,17 +152,72 @@ async function run() {
       console.log(result, 'this is company resule')
     })
 
-    
+
     //post applications:
-    app.post('/application', async(req, res)=>{
+    app.post('/application', async (req, res) => {
       const application = req.body;
       const newApplication = {
-        ...application, 
+        ...application,
         createAt: new Date()
       }
       const result = await applicationCollection.insertOne(newApplication);
       res.send(result)
-      console.log(result,'application post console')
+      console.log(result, 'application post console')
+    })
+
+    app.get("/application", async (req, res) => {
+      try {
+        // const { applicantId } = req.query;
+        const query = { applicantId: req.query.applicantId }
+        // if(req.query.applicantId){
+        //   query.applicantId = req.query.applicantId
+        // }
+
+        const applications = await applicationCollection
+          .find(query)
+          .toArray();
+
+        res.send(applications);
+      } catch (error) {
+        console.error(error);
+
+        res.status(500).send({
+          success: false,
+          message: "Failed to fetch applications",
+        });
+      }
+    });
+
+
+    // get plans:
+    app.get('/plans', async (req, res) => {
+      const query = {}
+      if (req.query.plan_id) {
+        query.id = req.query.plan_id
+      }
+      const result = await plans.findOne(query);
+      res.send(result)
+    })
+
+
+    //post subscription history:
+    app.post('/subscription', async (req, res) => {
+      const data = req.body;
+      const newData = {
+        ...data,
+        createAt: new Date()
+      }
+      const result = await subscriptions.insertOne(newData);
+      res.send(result)
+
+      const filter = {email: data?.email}
+      const updateDocument = {
+        $set:{
+          plan:data?.planType
+        }
+      }
+      const updateResult = await userCollection.updateOne(filter, updateDocument)
+
     })
 
 
