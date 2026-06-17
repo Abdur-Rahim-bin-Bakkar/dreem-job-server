@@ -153,6 +153,49 @@ async function run() {
     })
 
 
+    //get all company
+    app.get('/all/company', async (req, res) => {
+      const result = await companyCollection.find().toArray()
+      res.send(result || [])
+      console.log(result, 'this is company resule')
+    })
+    //update company status
+
+    app.patch('/company/:id/status', async (req, res) => {
+      try {
+        const companyId = req.params.id;
+        const { status } = req.body;
+
+        // optional: validate status
+        const allowedStatus = ['pending', 'approved', 'rejected'];
+        if (!allowedStatus.includes(status)) {
+          return res.status(400).json({ message: 'Invalid status value' });
+        }
+
+        const result = await companyCollection.updateOne(
+          { _id: new ObjectId(companyId) },
+          {
+            $set: {
+              status: status,
+            },
+          }
+        );
+
+        if (result.modifiedCount === 0) {
+          return res.status(404).json({ message: 'Company not found or status not changed' });
+        }
+
+        res.json({
+          message: 'Status updated successfully',
+          result,
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+
     //post applications:
     app.post('/application', async (req, res) => {
       const application = req.body;
@@ -210,15 +253,23 @@ async function run() {
       const result = await subscriptions.insertOne(newData);
       res.send(result)
 
-      const filter = {email: data?.email}
+      const filter = { email: data?.email }
       const updateDocument = {
-        $set:{
-          plan:data?.planType
+        $set: {
+          plan: data?.planType
         }
       }
       const updateResult = await userCollection.updateOne(filter, updateDocument)
 
     })
+
+
+    //get all users:
+    app.get('/users', async (req, res) => {
+      const result = await userCollection.find().toArray()
+      res.send(result)
+    })
+
 
 
 
